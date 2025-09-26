@@ -53,7 +53,7 @@ The SFP framework (Fig. b) breaks this limitation. We treat the forecasting mode
   <img src="Figure/stage2.png" width="900" alt="stage2 Paradigm">
 </p>
 <p align="center">
-  <b>Figure 3: : Iterative Policy Optimization via Planning and Self-Training.
+  <b>Figure 3: Iterative Policy Optimization via Planning and Self-Training.
 </p>
 
 3.  **State-of-the-Art Performance**: On several challenging benchmarks (e.g., extreme weather, turbulence, combustion), SFP demonstrates significant improvements:
