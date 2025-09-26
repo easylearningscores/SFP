@@ -47,7 +47,7 @@ The SFP framework (Fig. b) breaks this limitation. We treat the forecasting mode
 <p align="center">
   <b>Figure 2: Architecture of our Generative World Model.
 </p>
-
+    
 
 <p align="center">
   <img src="Figure/stage2.png" width="900" alt="stage2 Paradigm">
@@ -61,5 +61,12 @@ The SFP framework (Fig. b) breaks this limitation. We treat the forecasting mode
     *   **Optimized Domain Metrics**: Boosted the Critical Success Index (CSI) by an average of **29.7%** on the SEVIR dataset and reduced the Turbulent Kinetic Energy (TKE) spectrum error by an average of **57.3%** on the NSE task.
     *   **Enhanced Physical Consistency**: Generated more realistic, fine-grained vortex structures in turbulence simulations with energy spectra that closely match ground truth.
     *   **Superior Extreme Event Capture**: Accurately predicted high-intensity cores of marine heatwaves that were completely missed by baseline models, especially in data-scarce settings.
+
+<p align="center">
+  <img src="Figure/Table1.png" width="900" alt="stage2 Paradigm">
+</p>
+<p align="center">
+</p>
   
+---
 
