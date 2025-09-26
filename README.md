@@ -70,3 +70,20 @@ The SFP framework (Fig. b) breaks this limitation. We treat the forecasting mode
   
 ---
 
+## 🛠️ Getting Started
+
+### 1. Environment Setup
+
+We recommend using Conda to set up the environment:
+
+```bash
+# Clone the repository
+git clone https://github.com/easylearningscores/SFP.git
+cd SFP
+
+# Create and activate the Conda environment
+conda create -n sfp python=3.9
+conda activate sfp
+
+# Install dependencies
+pip install -r requirements.txt
