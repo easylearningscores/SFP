@@ -6,3 +6,7 @@ This repository contains the official PyTorch implementation for our paper, "**S
 
 
 # Spatiotemporal Forecasting as Planning (SFP)
+</div>
+<div align=center>
+<img src="Figure/github_intro.png" width="1080">
+</div>
