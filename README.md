@@ -144,3 +144,28 @@ This script will save the final trained Agent model to the path specified in you
 torchrun --nproc_per_node=N train_stage2_agent.py --config configs/agent_config.yaml
 ```
 
+---
+
+## 👁 Qualitative Results
+
+Beyond the quantitative metrics, SFP excels at producing physically plausible and accurate forecasts. The following case studies provide a visual demonstration of SFP's advantages over conventional supervised baselines.
+
+### Forecasting Extreme Marine Heatwaves
+
+Our SFP framework is particularly skilled at capturing rare but critical extreme events. The animation below shows a direct comparison for forecasting a severe marine heatwave. 
+
+<p align="center">
+  <em>(Left to Right):Ground Truth, SFP (Ours)</em>
+  <br>
+  <img src="Figure/sst.gif" alt="Marine Heatwave Forecasting">
+</p>
+
+### High-Fidelity Combustion Simulation (Prometheus)
+
+SFP also demonstrates superior performance in maintaining physical consistency and capturing fine-grained details in complex fluid dynamics. 
+
+<p align="center">
+  <em>(Left to Right):  Ground Truth, SFP (Ours)</em>
+  <br>
+  <img src="Figure/Prometheus.gif" alt="Combustion Simulation">
+</p>
