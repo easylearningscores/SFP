@@ -169,4 +169,13 @@ torchrun --nproc_per_node=NUM_GPUS pretrain_multi_scale.py
     *   The best-performing model checkpoint is saved to `./checkpoints/beamvq_reconstruction_v1_best_model.pth`.
 5.  **Final Testing**: Once training is complete, the script automatically loads the best model checkpoint, runs a final evaluation on the test set, and saves the results (inputs, targets, and outputs) as `.npy` files in the `./results/` directory.
 
+The reconstruction results are as shown in the figure below:
+<p align="center">
+  <img src="Figure/var_01_com.png" width="1000" alt="reconstruction results Paradigm">
+</p>
+<p align="center">
+  <b>Figure 4: reconstruction results.
+</p>
+
+    
 Upon successful completion of these steps, you will have a pre-trained, high-quality Generative World Model ready for use in Stage 2 of the SFP framework.
