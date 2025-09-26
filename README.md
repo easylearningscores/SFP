@@ -82,3 +82,16 @@ conda activate sfp
 
 # Install dependencies
 pip install -r requirements.txt
+```
+
+### 2. Dataset Preparation
+Please download the required datasets and place them under a unified data/ directory. You will need to specify the path to your data in the configuration files.
+
+
+
+### 3. SFP Two-Stage Training Pipeline
+Our framework is trained in two separate stages. Each stage is executed by a main script, with parameters managed through YAML configuration files located in the configs/ directory.
+
+
+
+
