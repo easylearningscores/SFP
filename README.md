@@ -87,3 +87,86 @@ conda activate sfp
 
 # Install dependencies
 pip install -r requirements.txt
+```
+
+### 2. Stage 1 Reproduction: Pre-training the Generative World Model
+
+In the first stage of the SFP framework, our primary goal is to train a high-quality **Generative World Model (GWM)**. This model, based on a Conditional VQ-VAE architecture with a Top-K quantization mechanism, is designed to learn the fundamental dynamics and data distribution of the physical system. It is trained through a **reconstruction task**: learning to encode an input spatiotemporal state into a discrete latent representation and then accurately decode it back to its original state.
+
+The success of this stage is foundational for the subsequent planning task (Stage 2), as it provides the agent with a high-fidelity and explorable "imagination space."
+
+#### Step 1: Understanding the Data Loader (`dataloader_rec.py`)
+
+We use the `dataloader_rec.py` script to prepare the training data. Its key features are:
+
+*   **Designed for Reconstruction**: The `__getitem__` function returns `(data, data.clone())`, meaning the model's input and target are identical, which aligns with the autoencoder training paradigm.
+*   **On-Demand Loading**: Instead of loading the entire dataset into memory at once, data is read from `.nc` files on disk as needed. This is ideal for handling large-scale climate datasets.
+*   **Flexibility**: It supports filtering data by year, variable, and time step, facilitating various experimental configurations.
+
+#### Step 2: Understanding the Model Architecture (`generative_world_model.py`)
+
+The core model architecture is defined in `generative_world_model.py`. It consists of several key components:
+
+1.  **`AtmosphericEncoder` & `AtmosphericDecoder`**: A multi-scale convolutional encoder-decoder pair with skip connections, designed to efficiently capture spatial features at different scales.
+2.  **`VectorQuantizerEMA`**: The core Top-K vector quantization module. It maps the continuous features from the encoder to the *K* nearest codebook vectors, thereby discretizing the latent space. This not only compresses information but also provides the basis for generating diversity through the Top-K selections.
+3.  **`Generative_World_Model`**: The top-level wrapper class. Its forward pass returns three critical outputs:
+    *   `pred`: The primary reconstructed image, based on the single closest (Top-1) codebook vector.
+    *   `top_k_features`: A list containing multiple versions of the reconstructed image, each decoded from one of the Top-K nearest codebook vectors. This embodies the "generative" capability of the model and provides diverse future possibilities for planning.
+    *   `vq_loss`: The loss incurred during the quantization process, used to optimize the codebook.
+
+You can easily instantiate and test the model as shown below:
+
+```python
+if __name__ == '__main__':
+    # --- Instantiate and Test the Model ---
+    # Create a sample input tensor: batch size of 1, 69 climate variables, 180x360 resolution
+    input_tensor = torch.rand(1, 69, 180, 360)
+    
+    # Initialize the Generative World Model
+    # in_channel: Number of input channels (i.e., number of variables)
+    # res_layers: Number of layers in the encoder/decoder
+    # embedding_nums: Size of the codebook (K)
+    # embedding_dim: Dimensionality of each codebook vector (D)
+    # top_k: The number of nearest neighbors to select during quantization
+    model = Generative_World_Model(in_channel=69,
+                                   res_layers=2,
+                                   embedding_nums=1024, 
+                                   embedding_dim=256,
+                                   top_k=10)
+    
+    # Perform a forward pass
+    pred, top_k_features, vq_loss = model(input_tensor)
+    
+    # Print the shapes of the outputs
+    print(f"Shape of the primary reconstruction: {pred.shape}")
+    print(f"Number of Top-K generated samples: {len(top_k_features)}")
+    print(f"Shape of the first Top-K sample: {top_k_features[0].shape}")
+    print(f"VQ-Loss: {vq_loss.item()}")
+```
+
+#### Step 3: Running the Training (`pretrain_multi_scale.py`)
+
+The `pretrain_multi_scale.py` script is the main entry point for executing the Stage 1 training. It integrates the data loader and model definition and includes a complete multi-GPU distributed training (DDP) workflow.
+
+**How to Run the Training:**
+
+This script is designed for a multi-GPU environment. You need to launch it using `torchrun` or a similar utility. Assuming you have `N` GPUs available, run the following command in your terminal:
+
+```bash
+# Replace NUM_GPUS with the number of GPUs you wish to use (e.g., 4 or 8)
+torchrun --nproc_per_node=NUM_GPUS pretrain_multi_scale.py
+```
+
+**What the Script Does:**
+
+1.  **Initializes Distributed Environment**: Sets up a process for each GPU.
+2.  **Prepares Distributed Datasets**: Uses `DistributedSampler` to efficiently shard the data across all GPUs.
+3.  **Builds the Model**: Initializes `Generative_World_Model` and wraps it with `DistributedDataParallel`.
+4.  **Starts the Training Loop**:
+    *   The model is trained on the training set. The total loss is a weighted sum of the **Reconstruction Loss (MSE)** and the **Codebook Loss (VQ Loss)**.
+    *   After each epoch, performance is evaluated on the validation set.
+    *   Training logs are saved to the `./logs/` directory.
+    *   The best-performing model checkpoint is saved to `./checkpoints/beamvq_reconstruction_v1_best_model.pth`.
+5.  **Final Testing**: Once training is complete, the script automatically loads the best model checkpoint, runs a final evaluation on the test set, and saves the results (inputs, targets, and outputs) as `.npy` files in the `./results/` directory.
+
+Upon successful completion of these steps, you will have a pre-trained, high-quality Generative World Model ready for use in Stage 2 of the SFP framework.
