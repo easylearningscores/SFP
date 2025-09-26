@@ -1,0 +1,28 @@
+log_path: "./logs/sfp_stage2_training.log"
+
+data:
+  train_path: "/training/data"
+  val_path: "/validation/data"
+
+models:
+  gwm:
+    checkpoint_path: "./checkpoints/gwm_best.pth" # Trained model from stage 1
+    z_dim: 256
+    embedding_dim: 256
+    num_embeddings: 1024
+    top_k: 10
+  
+  agent:
+    save_path: "./checkpoints/agent_best.pth"
+    backbone_name: "simvp"
+    latent_dim: 512 
+
+planning:
+  reward_function: "csi"  # Reward function: csi, tke, ssim
+  beam_width: 10           # Beam search width (B), must be <= gwm.top_k
+
+# Training parameters
+training:
+  batch_size: 16
+  epochs: 100
+  lr: 0.0001
