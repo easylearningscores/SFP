@@ -82,7 +82,7 @@ git clone https://github.com/easylearningscores/SFP.git
 cd SFP
 
 # Create and activate the Conda environment
-conda create -n sfp python=3.9
+conda create -n sfp python=3.8
 conda activate sfp
 
 # Install dependencies
