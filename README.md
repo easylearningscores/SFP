@@ -117,3 +117,30 @@ Example reconstruction results from the trained GWM are shown below:
 <b>Figure 4</b>: Reconstruction results of the GWM.
 </p>
 
+#### **Stage 2: Optimizing the Agent via Planning & Self-Training**
+
+With the weights of the Generative World Model frozen, we now proceed to train the Agent (`models/agent.py`). The Agent's policy is optimized through our proposed planning and self-training loop. This process enables the Agent to learn how to achieve high scores on the non-differentiable domain metric defined by the reward function.
+
+**1. Configure:**
+Open the `configs/agent_config.yaml` file. **Crucially, ensure the `gwm_checkpoint_path` points to the model saved in Stage 1.** You can also configure the `backbone_name` (e.g., `simvp`, `fno`), the `reward_function` (`csi`, `tke`, `ssim`), and other training hyperparameters.
+
+**2. Run Training:**
+Execute the Stage 2 training script. It also supports multi-GPU training with DDP.
+
+```bash
+# Replace N with the number of GPUs you wish to use
+torchrun --nproc_per_node=N train_stage2_agent.py --config configs/agent_config.yaml
+```
+**3. What Happens Inside the Loop:**
+*   The **Agent** proposes an `action` based on the current state.
+*   The **Planner** uses the frozen GWM to generate a diverse set of possible futures based on the action.
+*   The non-differentiable **reward function** evaluates each future to find the one with the highest reward.
+*   This high-reward future is selected as the **pseudo-label**.
+*   The **Agent** is then updated by training it to predict this high-quality pseudo-label.
+
+**4. Outcome:**
+This script will save the final trained Agent model to the path specified in your config file. This Agent is now specialized in optimizing for the target domain metric.
+```bash
+torchrun --nproc_per_node=N train_stage2_agent.py --config configs/agent_config.yaml
+```
+
