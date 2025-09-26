@@ -93,5 +93,27 @@ Please download the required datasets and place them under a unified data/ direc
 Our framework is trained in two separate stages. Each stage is executed by a main script, with parameters managed through YAML configuration files located in the configs/ directory.
 
 
+#### **Stage 1: Pre-training the Generative World Model (GWM)**
 
+In this stage, we train the conditional VQ-VAE model, defined in `models/gwm.py`. The objective is to learn the fundamental dynamics of the physical system through a reconstruction task. A well-trained GWM provides a high-fidelity "imagination space," which is a critical prerequisite for the planning and self-training in Stage 2.
+
+**1. Configure:**
+Open the `configs/gwm_config.yaml` file. Adjust the data paths, batch size, learning rate, and other model parameters to match your specific dataset and hardware setup.
+
+**2. Run Training:**
+Execute the Stage 1 training script from the project's root directory. The script is designed for multi-GPU training using DDP.
+
+```bash
+# Replace N with the number of GPUs you wish to use (e.g., 4 or 8)
+torchrun --nproc_per_node=N train_stage1_gwm.py --config configs/gwm_config.yaml
+```
+**3. Outcome:**
+This script will train the GWM and save the best-performing checkpoint (e.g., gwm_best.pth) to the output path specified in your configuration file.
+Example reconstruction results from the trained GWM are shown below:
+<p align="center">
+<img src="Figure/var_01_com.png" width="1000" alt="Reconstruction Results">
+</p>
+<p align="center">
+<b>Figure 4</b>: Reconstruction results of the GWM.
+</p>
 
